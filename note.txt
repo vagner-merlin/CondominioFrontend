@@ -1,0 +1,4 @@
+--pasos para el frontend
+-> instalar npm create vite@latest 
+-> escoger react (opcional) 
+->  una ves teniendo las api creamos todo acca 
