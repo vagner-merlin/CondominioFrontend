@@ -1,65 +1,137 @@
-// Configuración de la API
-export const API_BASE_URL = 'http://localhost:3000'; // Cambia esta URL por tu API
+// URL base de la API
+const API_BASE_URL = 'http://127.0.0.1:8000/api/auth';
 
-// Funciones de utilidad para autenticación
-export const authUtils = {
-  // Función para hacer login (conectarás tu API aquí)
-  login: async (email, password) => {
-    try {
-      // Aquí harás la conexión real con tu API
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-      
-      const data = await response.json();
-      
-      // Guardar token si lo hay
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-      }
-      
-      return data;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+// Funciones de validación
+export const validateEmail = (email) => {
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+};
+
+export const validatePassword = (password) => {
+  return password.length >= 6;
+};
+
+// Gestión de token
+export const setToken = (token) => {
+  localStorage.setItem('authToken', token);
+};
+
+export const getToken = () => {
+  return localStorage.getItem('authToken');
+};
+
+export const removeToken = () => {
+  localStorage.removeItem('authToken');
+};
+
+export const isAuthenticated = () => {
+  return !!getToken();
+};
+
+// API de autenticación
+export const registerSecretaria = async (userData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/register-secretaria/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Error en el registro');
     }
-  },
 
-  // Función para logout
-  logout: () => {
-    localStorage.removeItem('token');
-    // Redirigir al login o limpiar estado
-  },
-
-  // Verificar si está autenticado
-  isAuthenticated: () => {
-    return localStorage.getItem('token') !== null;
-  },
-
-  // Obtener token
-  getToken: () => {
-    return localStorage.getItem('token');
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
   }
 };
 
-// Funciones de utilidad generales
-export const utils = {
-  // Validar email
-  validateEmail: (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return re.test(email);
-  },
+export const login = async (email, password) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/login/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  // Validar password (mínimo 6 caracteres)
-  validatePassword: (password) => {
-    return password.length >= 6;
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Error en el login');
+    }
+
+    // Guardar el token
+    if (data.token) {
+      setToken(data.token);
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const getProfile = async () => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/profile/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al obtener perfil');
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const logout = async () => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/logout/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // Independientemente de la respuesta, removemos el token local
+    removeToken();
+
+    if (!response.ok) {
+      // Si hay error en logout del servidor, igual continuamos
+      console.warn('Error en logout del servidor, pero token local removido');
+    }
+
+    return { success: true };
+  } catch (error) {
+    // Asegurar que el token se remueva aunque haya error
+    removeToken();
+    return { success: false, error: error.message };
   }
 };

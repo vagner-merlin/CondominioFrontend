@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { authUtils, utils } from '../utils/auth';
+import { login, validateEmail, validatePassword } from '../utils/auth';
 import './Login.css';
 
-const Login = () => {
+const Login = ({ onNavigateToRegister, onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -12,15 +12,15 @@ const Login = () => {
     const newErrors = {};
     
     if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!utils.validateEmail(email)) {
-      newErrors.email = 'Please enter a valid email';
+      newErrors.email = 'El correo electrónico es requerido';
+    } else if (!validateEmail(email)) {
+      newErrors.email = 'Por favor ingresa un correo electrónico válido';
     }
     
     if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (!utils.validatePassword(password)) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = 'La contraseña es requerida';
+    } else if (!validatePassword(password)) {
+      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
     }
     
     setErrors(newErrors);
@@ -38,23 +38,19 @@ const Login = () => {
     setErrors({});
     
     try {
-      // Aquí se conectará con tu API cuando esté lista
-      console.log('Login attempt:', { email, password });
+      const result = await login(email, password);
       
-      // Por ahora simulamos la llamada
-      setTimeout(() => {
-        setIsLoading(false);
-        alert('¡Login exitoso! Pronto se conectará con tu API.');
-      }, 1000);
-      
-      // Cuando tengas tu API lista, descomenta esto:
-      // const result = await authUtils.login(email, password);
-      // console.log('Login successful:', result);
-      
+      if (result.success) {
+        // El token ya se guarda automáticamente en la función login
+        onLoginSuccess(result.data);
+      } else {
+        setErrors({ general: result.error });
+      }
     } catch (error) {
+      setErrors({ general: 'Error de conexión. Por favor intenta de nuevo.' });
+      console.error('Error de login:', error);
+    } finally {
       setIsLoading(false);
-      setErrors({ general: 'Login failed. Please try again.' });
-      console.error('Login error:', error);
     }
   };
 
@@ -66,8 +62,8 @@ const Login = () => {
             <div className="logo-icon">🏠</div>
             <h1>My Home</h1>
           </div>
-          <p className="welcome-text">Welcome to My Home</p>
-          <p className="subtitle">Sign in to access your account</p>
+          <p className="welcome-text">Bienvenido a My Home</p>
+          <p className="subtitle">Inicia sesión para acceder a tu cuenta</p>
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
@@ -78,13 +74,13 @@ const Login = () => {
           )}
           
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">Correo Electrónico</label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              placeholder="Ingresa tu correo electrónico"
               className={errors.email ? 'input-error' : ''}
             />
             {errors.email && (
@@ -93,13 +89,13 @@ const Login = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Contraseña</label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder="Ingresa tu contraseña"
               className={errors.password ? 'input-error' : ''}
             />
             {errors.password && (
@@ -115,20 +111,26 @@ const Login = () => {
             {isLoading ? (
               <>
                 <div className="spinner"></div>
-                Signing in...
+                Iniciando sesión...
               </>
             ) : (
-              'Sign In'
+              'Iniciar Sesión'
             )}
           </button>
 
           <div className="login-footer">
             <a href="#" className="forgot-password">
-              Forgot your password?
+              ¿Olvidaste tu contraseña?
             </a>
             <p className="signup-link">
-              Don't have an account? 
-              <a href="#"> Sign up here</a>
+              ¿No tienes cuenta? 
+              <button 
+                type="button" 
+                onClick={onNavigateToRegister} 
+                className="link-button"
+              >
+                Registrarse aquí
+              </button>
             </p>
           </div>
         </form>

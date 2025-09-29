@@ -207,6 +207,22 @@
   color: var(--gray);
 }
 
+.signup-link .link-button {
+  background: none;
+  border: none;
+  color: var(--primary-purple);
+  font-weight: 600;
+  margin-left: 4px;
+  transition: color 0.3s ease;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: inherit;
+}
+
+.signup-link .link-button:hover {
+  color: var(--dark-purple);
+}
+
 .signup-link a {
   color: var(--primary-purple);
   font-weight: 600;
