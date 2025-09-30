@@ -3,6 +3,8 @@ import Navbar from './Navbar';
 import Home from './Home';
 import UserRegistration from './UserRegistration';
 import UsersList from './UsersList';
+import PropietariosList from './PropietariosList';
+import PersonalList from './PersonalList';
 import { getProfile, logout } from '../utils/auth';
 import './Dashboard.css';
 
@@ -71,7 +73,16 @@ const Dashboard = ({ onLogout }) => {
             <UserRegistration />
           </div>
         );
-      case 'area-sociales':
+      case 'propietarios':
+        return (
+          <div className="page-content">
+            <PropietariosList 
+              userProfile={userProfile}
+              isAdmin={userProfile?.is_superuser || userProfile?.user?.is_superuser}
+            />
+          </div>
+        );
+      case 'areas-sociales':
         return (
           <div className="page-placeholder">
             <h2>Áreas Sociales</h2>
@@ -85,24 +96,20 @@ const Dashboard = ({ onLogout }) => {
             <p>Esta página estará disponible próximamente.</p>
           </div>
         );
-      case 'pago-expensas':
+      case 'pago-despensas':
         return (
           <div className="page-placeholder">
-            <h2>Pago de Expensas</h2>
+            <h2>Pago de Despensas</h2>
             <p>Esta página estará disponible próximamente.</p>
-          </div>
-        );
-      case 'usuarios':
-        return (
-          <div className="page-content">
-            <UsersList />
           </div>
         );
       case 'personal':
         return (
-          <div className="page-placeholder">
-            <h2>Personal</h2>
-            <p>Esta página estará disponible próximamente.</p>
+          <div className="page-content">
+            <PersonalList 
+              userProfile={userProfile}
+              isAdmin={userProfile?.is_superuser || userProfile?.user?.is_superuser}
+            />
           </div>
         );
       default:
@@ -146,7 +153,8 @@ const Dashboard = ({ onLogout }) => {
         activeRoute={activeRoute}
         onNavigate={handleNavigate}
         onLogout={handleLogout}
-        userName={userProfile?.user?.first_name || userProfile?.user?.username}
+        userName={userProfile?.first_name || userProfile?.username || userProfile?.user?.first_name || userProfile?.user?.username}
+        userProfile={userProfile}
       />
       <main className="dashboard-content">
         {renderCurrentView()}

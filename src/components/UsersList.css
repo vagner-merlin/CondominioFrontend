@@ -122,6 +122,11 @@
   letter-spacing: 0.05em;
 }
 
+.status-badge.admin {
+  background-color: #fbbf24;
+  color: #92400e;
+}
+
 .status-badge.staff {
   background-color: #ddd6fe;
   color: #7c3aed;
