@@ -13,8 +13,8 @@ const Register = ({ onNavigateToLogin }) => {
     telefono: '',
     direccion: '',
     sexo: 'F',
-    turno: 'MAÑANA',
-    velocidad_teclado: 50
+    turno: 'TARDE',
+    velocidad_teclado: 65
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});

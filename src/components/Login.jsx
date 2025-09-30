@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { login, validateEmail, validatePassword } from '../utils/auth';
+import { login, logout, validateEmail, validatePassword } from '../utils/auth';
 import './Login.css';
 
 const Login = ({ onNavigateToRegister, onLoginSuccess }) => {
@@ -41,8 +41,18 @@ const Login = ({ onNavigateToRegister, onLoginSuccess }) => {
       const result = await login(email, password);
       
       if (result.success) {
-        // El token ya se guarda automáticamente en la función login
-        onLoginSuccess(result.data);
+        // Verificar que solo ADMINISTRADORA o SECRETARIA puedan acceder
+        const userType = result.data.perfil?.tipo_usuario;
+        
+        if (userType === 'ADMINISTRADORA' || userType === 'SECRETARIA') {
+          onLoginSuccess(result.data);
+        } else {
+          setErrors({ 
+            general: 'Acceso denegado. Esta aplicación es solo para administradoras y secretarias.' 
+          });
+          // Hacer logout automático
+          await logout();
+        }
       } else {
         setErrors({ general: result.error });
       }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Home from './Home';
+import UserRegistration from './UserRegistration';
+import UsersList from './UsersList';
 import { getProfile, logout } from '../utils/auth';
 import './Dashboard.css';
 
@@ -40,6 +42,10 @@ const Dashboard = ({ onLogout }) => {
     console.log(`Navegando a: ${route}`);
   };
 
+  const handleProfileUpdate = (updatedProfile) => {
+    setUserProfile(updatedProfile);
+  };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -53,12 +59,16 @@ const Dashboard = ({ onLogout }) => {
   const renderCurrentView = () => {
     switch (activeRoute) {
       case 'home':
-        return <Home userProfile={userProfile} />;
+        return (
+          <Home 
+            userProfile={userProfile} 
+            onProfileUpdate={handleProfileUpdate}
+          />
+        );
       case 'registrar-usuario':
         return (
-          <div className="page-placeholder">
-            <h2>Registrar Usuario</h2>
-            <p>Esta página estará disponible próximamente.</p>
+          <div className="page-content">
+            <UserRegistration />
           </div>
         );
       case 'area-sociales':
@@ -75,8 +85,33 @@ const Dashboard = ({ onLogout }) => {
             <p>Esta página estará disponible próximamente.</p>
           </div>
         );
+      case 'pago-expensas':
+        return (
+          <div className="page-placeholder">
+            <h2>Pago de Expensas</h2>
+            <p>Esta página estará disponible próximamente.</p>
+          </div>
+        );
+      case 'usuarios':
+        return (
+          <div className="page-content">
+            <UsersList />
+          </div>
+        );
+      case 'personal':
+        return (
+          <div className="page-placeholder">
+            <h2>Personal</h2>
+            <p>Esta página estará disponible próximamente.</p>
+          </div>
+        );
       default:
-        return <Home userProfile={userProfile} />;
+        return (
+          <Home 
+            userProfile={userProfile} 
+            onProfileUpdate={handleProfileUpdate}
+          />
+        );
     }
   };
 

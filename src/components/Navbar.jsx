@@ -8,7 +8,10 @@ const Navbar = ({ activeRoute, onNavigate, onLogout, userName }) => {
     { key: 'home', label: 'Inicio', route: '/' },
     { key: 'registrar-usuario', label: 'Registrar Usuario', route: '/registrar-usuario' },
     { key: 'area-sociales', label: 'Áreas Sociales', route: '/area-sociales' },
-    { key: 'quejas', label: 'Quejas', route: '/quejas' }
+    { key: 'quejas', label: 'Quejas', route: '/quejas' },
+    { key: 'pago-expensas', label: 'Pago de Expensas', route: '/pago-expensas' },
+    { key: 'usuarios', label: 'Usuarios', route: '/usuarios' },
+    { key: 'personal', label: 'Personal', route: '/personal' }
   ];
 
   const handleNavClick = (route, key) => {

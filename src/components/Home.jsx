@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Home.css';
 
-const Home = ({ userProfile }) => {
+const Home = ({ userProfile, onProfileUpdate }) => {
   if (!userProfile) {
     return (
       <div className="home-container">
