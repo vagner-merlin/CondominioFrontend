@@ -114,10 +114,12 @@ const Dashboard = ({ onLogout }) => {
         );
       default:
         return (
-          <Home 
-            userProfile={userProfile} 
-            onProfileUpdate={handleProfileUpdate}
-          />
+          <div style={{width: '100%', minHeight: '100vh', padding: 0, margin: 0}}>
+            <Home 
+              userProfile={userProfile} 
+              onProfileUpdate={handleProfileUpdate}
+            />
+          </div>
         );
     }
   };
@@ -156,7 +158,7 @@ const Dashboard = ({ onLogout }) => {
         userName={userProfile?.first_name || userProfile?.username || userProfile?.user?.first_name || userProfile?.user?.username}
         userProfile={userProfile}
       />
-      <main className="dashboard-content">
+      <main className={activeRoute === 'home' ? '' : 'dashboard-content'}>
         {renderCurrentView()}
       </main>
     </div>

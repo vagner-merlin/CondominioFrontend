@@ -1,10 +1,12 @@
 .dashboard {
   min-height: 100vh;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f3f0ff 100%);
+  background: transparent;
 }
 
 .dashboard-content {
   min-height: calc(100vh - 64px);
+  background: transparent;
+  padding: 0;
 }
 
 .page-content {
