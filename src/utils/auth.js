@@ -645,3 +645,76 @@ export const getAllPagosDespensa = async () => {
     return { success: false, error: error.message };
   }
 };
+
+// API para propietarios-unidades
+export const getPropietarios = async () => {
+  try {
+    const token = getToken();
+    const response = await fetch('http://127.0.0.1:8000/api/propietarios/', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al obtener propietarios');
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const getUnidadesHabitacionales = async () => {
+  try {
+    const token = getToken();
+    const response = await fetch('http://127.0.0.1:8000/api/unidades-habitacionales/', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al obtener unidades habitacionales');
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const createPropietarioUnidad = async (propietarioUnidadData) => {
+  try {
+    const token = getToken();
+    const response = await fetch('http://127.0.0.1:8000/api/propietarios-unidades/', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(propietarioUnidadData),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      console.error('Error del backend:', data);
+      throw new Error(data.message || data.detail || 'Error al asignar propietario a unidad');
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error en createPropietarioUnidad:', error);
+    return { success: false, error: error.message };
+  }
+};

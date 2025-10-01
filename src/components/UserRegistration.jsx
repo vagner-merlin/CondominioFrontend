@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './UserRegistration.css';
-import { createUserComplete, validateEmail, validatePassword } from '../utils/auth';
+import { createUserComplete, validateEmail, validatePassword, getPropietarios, getUnidadesHabitacionales, createPropietarioUnidad } from '../utils/auth';
 
 const UserRegistration = () => {
   const [userType, setUserType] = useState('');
@@ -20,10 +20,42 @@ const UserRegistration = () => {
     fecha_contratacion: '',
     informacion_adicional: '',
     // Campos específicos para PROPIETARIO
-    codigo_propietario: ''
+    codigo_propietario: '',
+    // Campos específicos para HABITACIONES (propietarios-unidades)
+    is_principal: true,
+    propietario: '',
+    unidad_habitacional: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [propietarios, setPropietarios] = useState([]);
+  const [unidadesHabitacionales, setUnidadesHabitacionales] = useState([]);
+
+  // Cargar datos cuando se selecciona HABITACIONES
+  useEffect(() => {
+    if (userType === 'HABITACIONES') {
+      loadPropietariosYUnidades();
+    }
+  }, [userType]);
+
+  const loadPropietariosYUnidades = async () => {
+    try {
+      const [propietariosResult, unidadesResult] = await Promise.all([
+        getPropietarios(),
+        getUnidadesHabitacionales()
+      ]);
+
+      if (propietariosResult.success) {
+        setPropietarios(propietariosResult.data);
+      }
+
+      if (unidadesResult.success) {
+        setUnidadesHabitacionales(unidadesResult.data);
+      }
+    } catch (error) {
+      console.error('Error al cargar datos:', error);
+    }
+  };
 
   const handleUserTypeChange = (type) => {
     setUserType(type);
@@ -34,7 +66,10 @@ const UserRegistration = () => {
       turno: type === 'GUARDIA' ? 'NOCHE' : '',
       fecha_contratacion: '',
       informacion_adicional: '',
-      codigo_propietario: ''
+      codigo_propietario: '',
+      is_principal: type === 'HABITACIONES' ? true : false,
+      propietario: '',
+      unidad_habitacional: ''
     }));
     setErrors({});
   };
@@ -106,6 +141,15 @@ const UserRegistration = () => {
       }
     }
 
+    if (userType === 'HABITACIONES') {
+      if (!formData.propietario) {
+        newErrors.propietario = 'Debe seleccionar un propietario';
+      }
+      if (!formData.unidad_habitacional) {
+        newErrors.unidad_habitacional = 'Debe seleccionar una unidad habitacional';
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -121,42 +165,85 @@ const UserRegistration = () => {
     setErrors({});
 
     try {
-      // Preparar datos para enviar (sin confirmPassword y campos no necesarios)
-      const { confirmPassword, ...dataToSend } = formData;
-      
-      // Eliminar campos vacíos según el tipo de usuario
-      if (userType === 'GUARDIA') {
-        delete dataToSend.codigo_propietario;
-      } else if (userType === 'PROPIETARIO') {
-        delete dataToSend.turno;
-        delete dataToSend.fecha_contratacion;
-        delete dataToSend.informacion_adicional;
-      }
+      if (userType === 'HABITACIONES') {
+        // Para HABITACIONES, crear la asignación propietario-unidad
+        const propietarioUnidadData = {
+          is_principal: formData.is_principal,
+          propietario: parseInt(formData.propietario),
+          unidad_habitacional: parseInt(formData.unidad_habitacional)
+        };
 
-      const result = await createUserComplete(dataToSend);
-      
-      if (result.success) {
-        alert(`¡Usuario ${userType.toLowerCase()} creado exitosamente!`);
-        // Limpiar formulario
-        setFormData({
-          username: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          first_name: '',
-          last_name: '',
-          telefono: '',
-          direccion: '',
-          sexo: 'M',
-          tipo_usuario: '',
-          turno: 'NOCHE',
-          fecha_contratacion: '',
-          informacion_adicional: '',
-          codigo_propietario: ''
-        });
-        setUserType('');
+        console.log('Datos a enviar:', propietarioUnidadData);
+        const result = await createPropietarioUnidad(propietarioUnidadData);
+        console.log('Resultado del API:', result);
+        
+        if (result.success) {
+          alert('¡Propietario asignado a unidad habitacional exitosamente!');
+          // Limpiar formulario
+          setFormData({
+            username: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+            first_name: '',
+            last_name: '',
+            telefono: '',
+            direccion: '',
+            sexo: 'M',
+            tipo_usuario: '',
+            turno: 'NOCHE',
+            fecha_contratacion: '',
+            informacion_adicional: '',
+            codigo_propietario: '',
+            is_principal: true,
+            propietario: '',
+            unidad_habitacional: ''
+          });
+          setUserType('');
+        } else {
+          setErrors({ general: result.error });
+        }
       } else {
-        setErrors({ general: result.error });
+        // Para GUARDIA y PROPIETARIO, crear usuario
+        const { confirmPassword, is_principal, propietario, unidad_habitacional, ...dataToSend } = formData;
+      
+        // Eliminar campos vacíos según el tipo de usuario
+        if (userType === 'GUARDIA') {
+          delete dataToSend.codigo_propietario;
+        } else if (userType === 'PROPIETARIO') {
+          delete dataToSend.turno;
+          delete dataToSend.fecha_contratacion;
+          delete dataToSend.informacion_adicional;
+        }
+
+        const result = await createUserComplete(dataToSend);
+        
+        if (result.success) {
+          alert(`¡Usuario ${userType.toLowerCase()} creado exitosamente!`);
+          // Limpiar formulario
+          setFormData({
+            username: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+            first_name: '',
+            last_name: '',
+            telefono: '',
+            direccion: '',
+            sexo: 'M',
+            tipo_usuario: '',
+            turno: 'NOCHE',
+            fecha_contratacion: '',
+            informacion_adicional: '',
+            codigo_propietario: '',
+            is_principal: true,
+            propietario: '',
+            unidad_habitacional: ''
+          });
+          setUserType('');
+        } else {
+          setErrors({ general: result.error });
+        }
       }
     } catch (error) {
       setErrors({ general: 'Error de conexión. Inténtalo de nuevo.' });
@@ -192,6 +279,14 @@ const UserRegistration = () => {
             <h3>Propietario</h3>
             <p>Propietario de una unidad en el condominio</p>
           </div>
+          <div 
+            className={`type-option ${userType === 'HABITACIONES' ? 'selected' : ''}`}
+            onClick={() => handleUserTypeChange('HABITACIONES')}
+          >
+            <div className="type-icon">🏢</div>
+            <h3>Asignar Habitaciones</h3>
+            <p>Gestión y asignación de habitaciones</p>
+          </div>
         </div>
         {errors.tipo_usuario && (
           <span className="error-text">{errors.tipo_usuario}</span>
@@ -207,8 +302,9 @@ const UserRegistration = () => {
             </div>
           )}
 
-          <div className="form-section">
-            <h3>Información Personal</h3>
+          {(userType === 'GUARDIA' || userType === 'PROPIETARIO') && (
+            <div className="form-section">
+              <h3>Información Personal</h3>
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="username">Nombre de Usuario</label>
@@ -219,7 +315,7 @@ const UserRegistration = () => {
                   value={formData.username}
                   onChange={handleChange}
                   className={errors.username ? 'error' : ''}
-                  placeholder={`Ej: ${userType === 'GUARDIA' ? 'miguel_guardia' : 'ana_propietaria'}`}
+                  placeholder={`Ej: ${userType === 'GUARDIA' ? 'miguel_guardia' : userType === 'PROPIETARIO' ? 'ana_propietaria' : 'admin_habitaciones'}`}
                 />
                 {errors.username && (
                   <span className="error-text">{errors.username}</span>
@@ -235,7 +331,7 @@ const UserRegistration = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className={errors.email ? 'error' : ''}
-                  placeholder={`Ej: ${userType === 'GUARDIA' ? 'miguel@condominio.com' : 'ana@gmail.com'}`}
+                  placeholder={`Ej: ${userType === 'GUARDIA' ? 'miguel@condominio.com' : userType === 'PROPIETARIO' ? 'ana@gmail.com' : 'admin@condominio.com'}`}
                 />
                 {errors.email && (
                   <span className="error-text">{errors.email}</span>
@@ -287,7 +383,7 @@ const UserRegistration = () => {
                   value={formData.first_name}
                   onChange={handleChange}
                   className={errors.first_name ? 'error' : ''}
-                  placeholder={`Ej: ${userType === 'GUARDIA' ? 'Miguel' : 'Ana'}`}
+                  placeholder={`Ej: ${userType === 'GUARDIA' ? 'Miguel' : userType === 'PROPIETARIO' ? 'Ana' : 'Carlos'}`}
                 />
                 {errors.first_name && (
                   <span className="error-text">{errors.first_name}</span>
@@ -303,7 +399,7 @@ const UserRegistration = () => {
                   value={formData.last_name}
                   onChange={handleChange}
                   className={errors.last_name ? 'error' : ''}
-                  placeholder={`Ej: ${userType === 'GUARDIA' ? 'García' : 'López'}`}
+                  placeholder={`Ej: ${userType === 'GUARDIA' ? 'García' : userType === 'PROPIETARIO' ? 'López' : 'Mendoza'}`}
                 />
                 {errors.last_name && (
                   <span className="error-text">{errors.last_name}</span>
@@ -321,7 +417,7 @@ const UserRegistration = () => {
                   value={formData.telefono}
                   onChange={handleChange}
                   className={errors.telefono ? 'error' : ''}
-                  placeholder={`Ej: ${userType === 'GUARDIA' ? '+591 65432100' : '+591 70987654'}`}
+                  placeholder={`Ej: ${userType === 'GUARDIA' ? '+591 65432100' : userType === 'PROPIETARIO' ? '+591 70987654' : '+591 72345678'}`}
                 />
                 {errors.telefono && (
                   <span className="error-text">{errors.telefono}</span>
@@ -351,13 +447,14 @@ const UserRegistration = () => {
                 value={formData.direccion}
                 onChange={handleChange}
                 className={errors.direccion ? 'error' : ''}
-                placeholder={`Ej: ${userType === 'GUARDIA' ? 'Calle Secundaria 456, La Paz' : 'Av. Principal 789, La Paz'}`}
+                placeholder={`Ej: ${userType === 'GUARDIA' ? 'Calle Secundaria 456, La Paz' : userType === 'PROPIETARIO' ? 'Av. Principal 789, La Paz' : 'Zona Central 123, La Paz'}`}
               />
               {errors.direccion && (
                 <span className="error-text">{errors.direccion}</span>
               )}
             </div>
-          </div>
+            </div>
+          )}
 
           {/* Campos específicos por tipo de usuario */}
           {userType === 'GUARDIA' && (
@@ -433,12 +530,81 @@ const UserRegistration = () => {
             </div>
           )}
 
+          {userType === 'HABITACIONES' && (
+            <div className="form-section">
+              <h3>Asignar Propietario a Unidad Habitacional</h3>
+              <div className="form-group">
+                <label htmlFor="propietario">Seleccionar Propietario</label>
+                <select
+                  id="propietario"
+                  name="propietario"
+                  value={formData.propietario}
+                  onChange={handleChange}
+                  className={errors.propietario ? 'error' : ''}
+                >
+                  <option value="">-- Seleccionar Propietario --</option>
+                  {propietarios.map(prop => (
+                    <option key={prop.id} value={prop.id}>
+                      {prop.codigo_propietario} - {prop.user?.first_name} {prop.user?.last_name}
+                    </option>
+                  ))}
+                </select>
+                {errors.propietario && (
+                  <span className="error-text">{errors.propietario}</span>
+                )}
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="unidad_habitacional">Seleccionar Unidad Habitacional</label>
+                <select
+                  id="unidad_habitacional"
+                  name="unidad_habitacional"
+                  value={formData.unidad_habitacional}
+                  onChange={handleChange}
+                  className={errors.unidad_habitacional ? 'error' : ''}
+                >
+                  <option value="">-- Seleccionar Unidad --</option>
+                  {unidadesHabitacionales.map(unidad => (
+                    <option key={unidad.id} value={unidad.id}>
+                      {unidad.Descripcion}
+                    </option>
+                  ))}
+                </select>
+                {errors.unidad_habitacional && (
+                  <span className="error-text">{errors.unidad_habitacional}</span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="is_principal">
+                  <input
+                    type="checkbox"
+                    id="is_principal"
+                    name="is_principal"
+                    checked={formData.is_principal}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      is_principal: e.target.checked
+                    }))}
+                  />
+                  ¿Es propietario principal?
+                </label>
+                <p className="help-text">
+                  Marque esta opción si este propietario será el principal de la unidad habitacional.
+                </p>
+              </div>
+            </div>
+          )}
+
           <button 
             type="submit" 
             className="submit-button"
             disabled={isLoading}
           >
-            {isLoading ? 'Creando usuario...' : `Crear ${userType.toLowerCase()}`}
+            {isLoading ? 
+              (userType === 'HABITACIONES' ? 'Asignando...' : 'Creando usuario...') : 
+              (userType === 'HABITACIONES' ? 'Asignar Propietario a Unidad' : `Crear ${userType.toLowerCase()}`)
+            }
           </button>
         </form>
       )}
