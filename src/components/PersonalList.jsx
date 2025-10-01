@@ -19,19 +19,26 @@ const PersonalList = ({ userProfile, isAdmin }) => {
       setIsLoading(true);
       setError('');
       
-      console.log('Cargando personal...');
-      const result = await getAllUsers();
-      console.log('Resultado:', result);
+      console.log('Cargando usuarios...');
       
-      if (result.success) {
-        // Filtrar solo personal (is_staff = true)
-        const personalData = result.data.filter(user => user.is_staff);
+      // Solo usar API de usuarios
+      const usersResult = await getAllUsers();
+      
+      console.log('Usuarios:', usersResult);
+      
+      if (usersResult.success) {
+        // Filtrar solo staff (is_staff = true, excluyendo superuser si quieres)
+        const personalData = usersResult.data.filter(user => 
+          user.is_staff === true
+        );
+        
         setPersonal(personalData);
-        console.log('Personal cargado:', personalData);
+        console.log('Staff cargado:', personalData);
+        
       } else {
-        setError(result.error);
-        console.error('Error al cargar personal:', result.error);
+        setError('Error al cargar usuarios: ' + (usersResult.message || 'Error desconocido'));
       }
+      
     } catch (error) {
       console.error('Error en loadPersonal:', error);
       setError('Error al cargar personal: ' + error.message);
@@ -40,33 +47,35 @@ const PersonalList = ({ userProfile, isAdmin }) => {
     }
   };
 
-  const handleEditUser = (user) => {
-    setEditingUser(user);
+  const handleEditUser = (item) => {
+    setEditingUser(item);
     setIsEditModalOpen(true);
   };
 
-  const handleDeleteUser = async (userId, username) => {
+  const handleDeleteItem = async (item) => {
     if (!isAdmin) {
-      alert('No tienes permisos para eliminar usuarios');
+      alert('No tienes permisos para eliminar');
       return;
     }
 
-    if (window.confirm(`¿Estás seguro de que quieres eliminar al miembro del personal ${username}?`)) {
+    const confirmMessage = `¿Estás seguro de que quieres eliminar al usuario ${item.username}?`;
+
+    if (window.confirm(confirmMessage)) {
       try {
         setIsLoading(true);
-        console.log('Eliminando personal:', userId);
         
-        const result = await deleteUser(userId);
+        console.log('Eliminando usuario:', item.id);
+        const result = await deleteUser(item.id);
         
         if (result.success) {
-          alert('Miembro del personal eliminado exitosamente');
+          alert('Usuario eliminado exitosamente');
           loadPersonal(); // Recargar la lista
         } else {
-          alert('Error al eliminar miembro del personal: ' + result.error);
+          alert('Error al eliminar usuario: ' + result.error);
         }
       } catch (error) {
-        console.error('Error al eliminar personal:', error);
-        alert('Error al eliminar miembro del personal: ' + error.message);
+        console.error('Error al eliminar usuario:', error);
+        alert('Error al eliminar usuario: ' + error.message);
       } finally {
         setIsLoading(false);
       }
@@ -79,20 +88,26 @@ const PersonalList = ({ userProfile, isAdmin }) => {
     setEditingUser(null);
   };
 
-  const getRoleDisplay = (user) => {
-    if (user.is_superuser) return 'Administrador';
-    if (user.is_staff) return 'Secretaria';
-    return 'Personal';
+  const getItemData = (item) => {
+    return {
+      id: item.id,
+      username: item.username,
+      firstName: item.first_name,
+      lastName: item.last_name,
+      email: item.email,
+      isActive: item.is_active,
+      dateJoined: item.date_joined
+    };
   };
 
   if (isLoading) {
     return (
       <div className="users-list-container">
         <div className="users-header">
-          <h1>Personal del Condominio</h1>
+          <h1>Staff del Condominio</h1>
         </div>
         <div className="loading">
-          <p>Cargando personal...</p>
+          <p>Cargando staff...</p>
         </div>
       </div>
     );
@@ -102,7 +117,7 @@ const PersonalList = ({ userProfile, isAdmin }) => {
     return (
       <div className="users-list-container">
         <div className="users-header">
-          <h1>Personal del Condominio</h1>
+          <h1>Staff del Condominio</h1>
         </div>
         <div className="error-message">
           <p>Error: {error}</p>
@@ -115,14 +130,14 @@ const PersonalList = ({ userProfile, isAdmin }) => {
   return (
     <div className="users-list-container">
       <div className="users-header">
-        <h1>Personal del Condominio</h1>
-        <p>Total de personal: {personal.length}</p>
+        <h1>Staff del Condominio</h1>
+        <p>Total de staff: {personal.length}</p>
         <button onClick={loadPersonal} className="refresh-button">Actualizar Lista</button>
       </div>
 
       <div className="users-stats">
         <div className="stat-card">
-          <h3>Total Personal</h3>
+          <h3>Total Staff</h3>
           <p className="stat-number">{personal.length}</p>
         </div>
         <div className="stat-card">
@@ -130,7 +145,7 @@ const PersonalList = ({ userProfile, isAdmin }) => {
           <p className="stat-number">{personal.filter(user => user.is_superuser).length}</p>
         </div>
         <div className="stat-card">
-          <h3>Secretarias/Guardias</h3>
+          <h3>Staff Regular</h3>
           <p className="stat-number">{personal.filter(user => user.is_staff && !user.is_superuser).length}</p>
         </div>
         <div className="stat-card">
@@ -141,7 +156,7 @@ const PersonalList = ({ userProfile, isAdmin }) => {
 
       {personal.length === 0 ? (
         <div className="no-users">
-          <p>No hay personal registrado</p>
+          <p>No hay staff registrado</p>
         </div>
       ) : (
         <div className="users-table-container">
@@ -151,55 +166,52 @@ const PersonalList = ({ userProfile, isAdmin }) => {
                 <th>Usuario</th>
                 <th>Nombre Completo</th>
                 <th>Email</th>
-                <th>Rol</th>
                 <th>Estado</th>
                 <th>Fecha Registro</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {personal.map((user) => (
-                <tr key={user.id}>
-                  <td>
-                    <div className="user-info">
-                      <span className="username">{user.username}</span>
-                    </div>
-                  </td>
-                  <td>{user.first_name} {user.last_name}</td>
-                  <td>{user.email}</td>
-                  <td>
-                    <span className={`status-badge ${user.is_superuser ? 'admin' : 'staff'}`}>
-                      {getRoleDisplay(user)}
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`status-badge ${user.is_active ? 'active' : 'inactive'}`}>
-                      {user.is_active ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td>{new Date(user.date_joined).toLocaleDateString('es-ES')}</td>
-                  <td>
-                    <div className="action-buttons">
-                      <button 
-                        className="edit-btn"
-                        onClick={() => handleEditUser(user)}
-                        title="Modificar personal"
-                      >
-                        Modificar
-                      </button>
-                      {isAdmin && (
+              {personal.map((item, index) => {
+                const itemData = getItemData(item);
+                return (
+                  <tr key={itemData.id || index}>
+                    <td>
+                      <div className="user-info">
+                        <span className="username">{itemData.username}</span>
+                      </div>
+                    </td>
+                    <td>{itemData.firstName} {itemData.lastName}</td>
+                    <td>{itemData.email}</td>
+                    <td>
+                      <span className={`status-badge ${itemData.isActive ? 'active' : 'inactive'}`}>
+                        {itemData.isActive ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </td>
+                    <td>{itemData.dateJoined ? new Date(itemData.dateJoined).toLocaleDateString('es-ES') : 'N/A'}</td>
+                    <td>
+                      <div className="action-buttons">
                         <button 
-                          className="delete-btn"
-                          onClick={() => handleDeleteUser(user.id, user.username)}
-                          title="Eliminar personal"
+                          className="edit-btn"
+                          onClick={() => handleEditUser(item)}
+                          title="Modificar"
                         >
-                          Eliminar
+                          Modificar
                         </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        {isAdmin && (
+                          <button 
+                            className="delete-btn"
+                            onClick={() => handleDeleteItem(item)}
+                            title="Eliminar"
+                          >
+                            Eliminar
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

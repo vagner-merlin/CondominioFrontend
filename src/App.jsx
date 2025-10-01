@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import AdminRegister from './components/AdminRegister'
 import Dashboard from './components/Dashboard'
 import { isAuthenticated, removeToken } from './utils/auth'
 import './App.css'
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('login'); // 'login', 'register', 'dashboard'
+  const [currentPage, setCurrentPage] = useState('login'); // 'login', 'register', 'admin-register', 'dashboard'
   const [isAuthChecked, setIsAuthChecked] = useState(false);
 
   useEffect(() => {
@@ -23,6 +24,14 @@ function App() {
 
   const handleNavigateToLogin = () => {
     setCurrentPage('login');
+  };
+
+  const handleNavigateToAdminRegister = () => {
+    setCurrentPage('admin-register');
+  };
+
+  const handleBackToRegister = () => {
+    setCurrentPage('register');
   };
 
   const handleLoginSuccess = (loginData) => {
@@ -62,7 +71,14 @@ function App() {
       {currentPage === 'register' && (
         <RegisterPage 
           onNavigateToLogin={handleNavigateToLogin}
+          onNavigateToAdminRegister={handleNavigateToAdminRegister}
           onRegisterSuccess={handleRegisterSuccess}
+        />
+      )}
+      {currentPage === 'admin-register' && (
+        <AdminRegister 
+          onNavigateToLogin={handleNavigateToLogin}
+          onBack={handleBackToRegister}
         />
       )}
       {currentPage === 'dashboard' && (

@@ -24,10 +24,11 @@ const PropietariosList = ({ userProfile, isAdmin }) => {
       console.log('Resultado:', result);
       
       if (result.success) {
-        // Filtrar solo propietarios (is_staff = false)
-        const propietariosData = result.data.filter(user => !user.is_staff);
+        // Filtrar solo propietarios (is_staff = false AND is_superuser = false)
+        const propietariosData = result.data.filter(user => !user.is_staff && !user.is_superuser);
         setPropietarios(propietariosData);
         console.log('Propietarios cargados:', propietariosData);
+        console.log('Todos los usuarios:', result.data);
       } else {
         setError(result.error);
         console.error('Error al cargar propietarios:', result.error);

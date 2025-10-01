@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import './Register.css';
-import { registerSecretaria, validateEmail, validatePassword } from '../utils/auth';
+import { registerAdministrador } from '../utils/auth';
 
-const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
+const AdminRegister = ({ onNavigateToLogin, onBack }) => {
+  const [step, setStep] = useState('password'); // 'password' o 'form'
+  const [systemPassword, setSystemPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -12,18 +15,29 @@ const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
     last_name: '',
     telefono: '',
     direccion: '',
-    sexo: 'F',
-    turno: 'TARDE',
-    velocidad_teclado: 65
+    sexo: 'M'
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  const SYSTEM_PASSWORD = 'adminn'; // Contraseña del sistema
+
+  const handlePasswordVerification = (e) => {
+    e.preventDefault();
+    if (systemPassword === SYSTEM_PASSWORD) {
+      setStep('form');
+      setPasswordError('');
+    } else {
+      setPasswordError('Lo siento, no puedes crear usuario administrador');
+      setSystemPassword('');
+    }
+  };
+
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: type === 'number' ? parseInt(value) || 0 : value
+      [name]: value
     }));
   };
 
@@ -57,45 +71,40 @@ const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
     if (!formData.last_name.trim()) {
       newErrors.last_name = 'El apellido es requerido';
     }
-    
+
     if (!formData.telefono.trim()) {
       newErrors.telefono = 'El teléfono es requerido';
     }
-    
+
     if (!formData.direccion.trim()) {
       newErrors.direccion = 'La dirección es requerida';
     }
     
-    if (formData.velocidad_teclado < 1 || formData.velocidad_teclado > 200) {
-      newErrors.velocidad_teclado = 'La velocidad debe estar entre 1 y 200 palabras por minuto';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) {
+    const newErrors = validateForm();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
-    
+
     setIsLoading(true);
     setErrors({});
-    
+
     try {
-      // Preparar datos para enviar (sin confirmPassword)
-      const { confirmPassword, ...dataToSend } = formData;
-      
-      const result = await registerSecretaria(dataToSend);
-      
+      const result = await registerAdministrador(formData);
+
       if (result.success) {
-        alert('¡Registro exitoso! Ahora puedes iniciar sesión con tus credenciales.');
+        alert('¡Administrador registrado exitosamente! Ahora puedes iniciar sesión.');
         onNavigateToLogin();
       } else {
         setErrors({ general: result.error });
       }
+      
     } catch (error) {
       setErrors({ general: 'Error de conexión. Por favor intenta de nuevo.' });
       console.error('Error de registro:', error);
@@ -104,6 +113,71 @@ const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
     }
   };
 
+  // Paso 1: Verificación de contraseña del sistema
+  if (step === 'password') {
+    return (
+      <div className="register-container">
+        <div className="register-card">
+          <div className="register-header">
+            <div className="logo-container">
+              <img 
+                src="/img/administradora.jpeg" 
+                alt="Administrador" 
+                className="register-image"
+              />
+              <div>
+                <h1>Crear Administrador</h1>
+                <p className="subtitle">Ingresa la contraseña del sistema</p>
+              </div>
+            </div>
+          </div>
+
+          <form className="register-form" onSubmit={handlePasswordVerification}>
+            <div className="system-password-info">
+              <div className="info-box">
+                <h3>🔐 Contraseña del Sistema</h3>
+                <p>Es una contraseña que te permite crear usuarios administrador</p>
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="systemPassword">Contraseña del Sistema *</label>
+              <input
+                type="password"
+                id="systemPassword"
+                value={systemPassword}
+                onChange={(e) => setSystemPassword(e.target.value)}
+                placeholder="Ingresa la contraseña del sistema"
+                className={passwordError ? 'input-error' : ''}
+                autoFocus
+              />
+              {passwordError && (
+                <span className="field-error">{passwordError}</span>
+              )}
+            </div>
+
+            <div className="form-buttons">
+              <button 
+                type="button" 
+                onClick={onBack}
+                className="secondary-button"
+              >
+                Volver
+              </button>
+              <button 
+                type="submit" 
+                className="register-button"
+              >
+                Verificar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Paso 2: Formulario de registro
   return (
     <div className="register-container">
       <div className="register-card">
@@ -111,12 +185,12 @@ const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
           <div className="logo-container">
             <img 
               src="/img/administradora.jpeg" 
-              alt="Administradora" 
+              alt="Administrador" 
               className="register-image"
             />
             <div>
-              <h1>Registrar Administradora</h1>
-              <p className="subtitle">Completa todos los campos para crear tu cuenta</p>
+              <h1>Registrar Administrador</h1>
+              <p className="subtitle">Completa todos los campos para crear la cuenta</p>
             </div>
           </div>
         </div>
@@ -137,7 +211,7 @@ const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                placeholder="ej: ana_secretaria"
+                placeholder="ej: admin_carlos"
                 className={errors.username ? 'input-error' : ''}
               />
               {errors.username && (
@@ -153,11 +227,45 @@ const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="ej: ana@condominio.com"
+                placeholder="ej: carlos@condominio.com"
                 className={errors.email ? 'input-error' : ''}
               />
               {errors.email && (
                 <span className="field-error">{errors.email}</span>
+              )}
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="first_name">Nombre *</label>
+              <input
+                type="text"
+                id="first_name"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleChange}
+                placeholder="ej: Carlos"
+                className={errors.first_name ? 'input-error' : ''}
+              />
+              {errors.first_name && (
+                <span className="field-error">{errors.first_name}</span>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="last_name">Apellido *</label>
+              <input
+                type="text"
+                id="last_name"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleChange}
+                placeholder="ej: Mendoza"
+                className={errors.last_name ? 'input-error' : ''}
+              />
+              {errors.last_name && (
+                <span className="field-error">{errors.last_name}</span>
               )}
             </div>
           </div>
@@ -196,49 +304,15 @@ const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="first_name">Nombre *</label>
-              <input
-                type="text"
-                id="first_name"
-                name="first_name"
-                value={formData.first_name}
-                onChange={handleChange}
-                placeholder="ej: Ana"
-                className={errors.first_name ? 'input-error' : ''}
-              />
-              {errors.first_name && (
-                <span className="field-error">{errors.first_name}</span>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="last_name">Apellido *</label>
-              <input
-                type="text"
-                id="last_name"
-                name="last_name"
-                value={formData.last_name}
-                onChange={handleChange}
-                placeholder="ej: López"
-                className={errors.last_name ? 'input-error' : ''}
-              />
-              {errors.last_name && (
-                <span className="field-error">{errors.last_name}</span>
-              )}
-            </div>
-          </div>
-
           <div className="form-group">
             <label htmlFor="telefono">Teléfono *</label>
             <input
-              type="tel"
+              type="text"
               id="telefono"
               name="telefono"
               value={formData.telefono}
               onChange={handleChange}
-              placeholder="ej: +591 65432100"
+              placeholder="ej: +591 70555444"
               className={errors.telefono ? 'input-error' : ''}
             />
             {errors.telefono && (
@@ -254,7 +328,7 @@ const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
               name="direccion"
               value={formData.direccion}
               onChange={handleChange}
-              placeholder="ej: Calle Principal 456, La Paz"
+              placeholder="ej: Av. Administración 100, La Paz"
               className={errors.direccion ? 'input-error' : ''}
             />
             {errors.direccion && (
@@ -262,80 +336,48 @@ const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
             )}
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="sexo">Sexo</label>
-              <select
-                id="sexo"
-                name="sexo"
-                value={formData.sexo}
-                onChange={handleChange}
-              >
-                <option value="F">Femenino</option>
-                <option value="M">Masculino</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="turno">Turno de Trabajo</label>
-              <select
-                id="turno"
-                name="turno"
-                value={formData.turno}
-                onChange={handleChange}
-              >
-                <option value="MAÑANA">Mañana</option>
-                <option value="TARDE">Tarde</option>
-                <option value="NOCHE">Noche</option>
-              </select>
-            </div>
-          </div>
-
           <div className="form-group">
-            <label htmlFor="velocidad_teclado">Velocidad de Teclado (palabras por minuto)</label>
-            <input
-              type="number"
-              id="velocidad_teclado"
-              name="velocidad_teclado"
-              value={formData.velocidad_teclado}
+            <label htmlFor="sexo">Sexo *</label>
+            <select
+              id="sexo"
+              name="sexo"
+              value={formData.sexo}
               onChange={handleChange}
-              min="1"
-              max="200"
-              placeholder="ej: 60"
-              className={errors.velocidad_teclado ? 'input-error' : ''}
-            />
-            {errors.velocidad_teclado && (
-              <span className="field-error">{errors.velocidad_teclado}</span>
+              className={errors.sexo ? 'input-error' : ''}
+            >
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+            </select>
+            {errors.sexo && (
+              <span className="field-error">{errors.sexo}</span>
             )}
           </div>
 
-          <button 
-            type="submit" 
-            className="register-button"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <div className="spinner"></div>
-                Registrando...
-              </>
-            ) : (
-              'Registrar Administradora'
-            )}
-          </button>
+          <div className="form-buttons">
+            <button 
+              type="button" 
+              onClick={() => setStep('password')}
+              className="secondary-button"
+            >
+              Volver
+            </button>
+            <button 
+              type="submit" 
+              className="register-button"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <div className="spinner"></div>
+                  Registrando...
+                </>
+              ) : (
+                'Registrar Administrador'
+              )}
+            </button>
+          </div>
 
           <div className="register-footer">
-            <div className="admin-register-section">
-              <p className="admin-text">¿Necesitas registrar un administrador?</p>
-              <button 
-                type="button" 
-                onClick={onNavigateToAdminRegister}
-                className="admin-register-button"
-              >
-                Crear Cuenta Administrador
-              </button>
-            </div>
-            
             <p className="login-link">
               ¿Ya tienes cuenta? 
               <button 
@@ -353,4 +395,4 @@ const Register = ({ onNavigateToLogin, onNavigateToAdminRegister }) => {
   );
 };
 
-export default Register;
+export default AdminRegister;

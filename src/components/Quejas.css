@@ -1,0 +1,289 @@
+.quejas-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.quejas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.quejas-header h2 {
+  color: var(--primary-purple);
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.create-button {
+  background: var(--purple-gradient);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+}
+
+.create-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+}
+
+.create-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.create-form {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.create-form h3 {
+  color: var(--primary-purple);
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--dark-gray);
+  font-weight: 500;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.3s ease;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+}
+
+.form-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.submit-button {
+  background: var(--purple-gradient);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.cancel-button, .cancel-edit-button {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.loading, .error-message {
+  text-align: center;
+  padding: 40px;
+}
+
+.retry-button {
+  background: var(--primary-purple);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.quejas-list {
+  display: grid;
+  gap: 20px;
+}
+
+.queja-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid var(--primary-purple);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.queja-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.queja-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.queja-id {
+  font-weight: 600;
+  color: var(--primary-purple);
+  font-size: 1.1rem;
+}
+
+.estado-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.estado-badge.pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado-badge.proceso {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.estado-badge.resuelto {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.estado-badge.cerrado {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.queja-content {
+  margin-bottom: 20px;
+}
+
+.descripcion {
+  color: var(--dark-gray);
+  line-height: 1.6;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.queja-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 0.875rem;
+  color: var(--gray);
+}
+
+.queja-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.edit-button {
+  background: var(--primary-purple);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.edit-button:hover {
+  background: var(--dark-purple);
+}
+
+.delete-button {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+}
+
+.delete-button:hover {
+  background: #dc2626;
+}
+
+.estado-selector {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.estado-selector select {
+  padding: 8px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: white;
+}
+
+.no-quejas {
+  text-align: center;
+  color: var(--gray);
+  font-size: 1.1rem;
+  padding: 40px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.error-message {
+  background: white;
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #ef4444;
+}
+
+.error-message p {
+  color: #ef4444;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}

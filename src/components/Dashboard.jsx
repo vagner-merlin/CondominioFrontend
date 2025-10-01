@@ -5,6 +5,9 @@ import UserRegistration from './UserRegistration';
 import UsersList from './UsersList';
 import PropietariosList from './PropietariosList';
 import PersonalList from './PersonalList';
+import AreasSocialesMain from './AreasSocialesMain';
+import Quejas from './Quejas';
+import PagosDespensa from './PagosDespensa';
 import { getProfile, logout } from '../utils/auth';
 import './Dashboard.css';
 
@@ -84,23 +87,20 @@ const Dashboard = ({ onLogout }) => {
         );
       case 'areas-sociales':
         return (
-          <div className="page-placeholder">
-            <h2>Áreas Sociales</h2>
-            <p>Esta página estará disponible próximamente.</p>
+          <div className="page-content">
+            <AreasSocialesMain />
           </div>
         );
       case 'quejas':
         return (
-          <div className="page-placeholder">
-            <h2>Quejas</h2>
-            <p>Esta página estará disponible próximamente.</p>
+          <div className="page-content">
+            <Quejas />
           </div>
         );
       case 'pago-despensas':
         return (
-          <div className="page-placeholder">
-            <h2>Pago de Despensas</h2>
-            <p>Esta página estará disponible próximamente.</p>
+          <div className="page-content">
+            <PagosDespensa />
           </div>
         );
       case 'personal':

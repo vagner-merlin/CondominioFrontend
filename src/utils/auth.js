@@ -274,3 +274,374 @@ export const deleteUser = async (userId) => {
     return { success: false, error: error.message };
   }
 };
+
+export const registerAdministrador = async (userData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/register-administrador/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Error en el registro');
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const getAllPerfiles = async () => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    console.log('Haciendo petición a:', 'http://127.0.0.1:8000/api/perfiles/');
+    const response = await fetch('http://127.0.0.1:8000/api/perfiles/', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log('Error response:', errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Data recibida de perfiles:', data);
+    
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error en getAllPerfiles:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+export const getPerfilById = async (perfilId) => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const response = await fetch(`http://127.0.0.1:8000/api/perfiles/${perfilId}/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al obtener perfil');
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const updatePerfil = async (perfilId, perfilData) => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const response = await fetch(`http://127.0.0.1:8000/api/perfiles/${perfilId}/`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(perfilData),
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.message || 'Error al actualizar perfil');
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+export const deletePerfil = async (perfilId) => {
+  try {
+    const token = getToken();
+    if (!token) {
+      throw new Error('No hay token de autenticación');
+    }
+
+    const response = await fetch(`http://127.0.0.1:8000/api/perfiles/${perfilId}/`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al eliminar perfil');
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// APIs de Áreas Sociales
+const AREAS_SOCIALES_API_URL = 'http://127.0.0.1:8000/api/areas-sociales';
+const REGISTROS_AREAS_API_URL = 'http://127.0.0.1:8000/api/registros-areas-sociales';
+
+// Obtener todas las áreas sociales
+export const getAllAreasSociales = async () => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${AREAS_SOCIALES_API_URL}/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al obtener áreas sociales');
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Obtener registros de áreas sociales
+export const getAllRegistrosAreasSociales = async () => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${REGISTROS_AREAS_API_URL}/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al obtener registros de áreas sociales');
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Obtener registros por área social específica
+export const getRegistrosByAreaSocial = async (areaSocialId) => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${REGISTROS_AREAS_API_URL}/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al obtener registros del área social');
+    }
+
+    const allData = await response.json();
+    
+    // Filtrar solo los registros que pertenecen al área social específica
+    const filteredData = allData.filter(registro => 
+      registro.AreaSocial === parseInt(areaSocialId)
+    );
+    
+    return { success: true, data: filteredData };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// APIs de Quejas
+const QUEJAS_API_URL = 'http://127.0.0.1:8000/api/quejas';
+
+// Obtener todas las quejas
+export const getAllQuejas = async () => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${QUEJAS_API_URL}/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al obtener quejas');
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Crear una nueva queja
+export const createQueja = async (quejaData) => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${QUEJAS_API_URL}/`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(quejaData),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al crear la queja');
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Obtener queja por ID
+export const getQuejaById = async (quejaId) => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${QUEJAS_API_URL}/${quejaId}/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al obtener la queja');
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Actualizar queja (cambiar estado)
+export const updateQueja = async (quejaId, quejaData) => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${QUEJAS_API_URL}/${quejaId}/`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(quejaData),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al actualizar la queja');
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Eliminar queja
+export const deleteQueja = async (quejaId) => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${QUEJAS_API_URL}/${quejaId}/`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al eliminar la queja');
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};
+
+// URL para pagos despensa
+const PAGOS_DESPENSA_API_URL = 'http://127.0.0.1:8000/api/pagos-despensa';
+
+// Obtener todos los pagos de despensa
+export const getAllPagosDespensa = async () => {
+  try {
+    const token = getToken();
+    const response = await fetch(`${PAGOS_DESPENSA_API_URL}/`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Token ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.message || 'Error al obtener pagos de despensa');
+    }
+
+    const data = await response.json();
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+};

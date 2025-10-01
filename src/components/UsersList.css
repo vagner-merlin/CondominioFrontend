@@ -24,6 +24,29 @@
   margin: 0 0 1rem 0;
 }
 
+.data-source-info {
+  margin: 0.5rem 0;
+}
+
+.source-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.source-badge.perfiles {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.source-badge.users {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
 .refresh-button {
   background-color: #8b5cf6;
   color: white;
@@ -130,6 +153,11 @@
 .status-badge.staff {
   background-color: #ddd6fe;
   color: #7c3aed;
+}
+
+.status-badge.guardia {
+  background-color: #10b981;
+  color: white;
 }
 
 .status-badge.regular {

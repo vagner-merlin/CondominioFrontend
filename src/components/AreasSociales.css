@@ -1,0 +1,152 @@
+.areas-sociales-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.areas-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.areas-header h1 {
+  color: #7c3aed;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.areas-header p {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.areas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.area-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.area-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(124, 58, 237, 0.2);
+  border-color: #7c3aed;
+}
+
+.area-image {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.area-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.area-card:hover .area-image img {
+  transform: scale(1.05);
+}
+
+.area-info {
+  padding: 20px;
+  text-align: center;
+}
+
+.area-info h3 {
+  color: #1f2937;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.area-id {
+  color: #7c3aed;
+  font-size: 0.9rem;
+  font-weight: 500;
+  background-color: #ede9fe;
+  padding: 4px 12px;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.loading, .error-message, .no-areas {
+  text-align: center;
+  padding: 50px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.loading p, .no-areas p {
+  color: #6b7280;
+  font-size: 1.2rem;
+}
+
+.error-message p {
+  color: #dc2626;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.refresh-button {
+  background-color: #7c3aed;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.refresh-button:hover {
+  background-color: #6d28d9;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .areas-sociales-container {
+    padding: 15px;
+  }
+  
+  .areas-header h1 {
+    font-size: 2rem;
+  }
+  
+  .areas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .area-image {
+    height: 150px;
+  }
+  
+  .area-info {
+    padding: 15px;
+  }
+  
+  .area-info h3 {
+    font-size: 1.3rem;
+  }
+}

@@ -1,0 +1,236 @@
+.reservas-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.reservas-header {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.volver-button {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.volver-button:hover {
+  background-color: #4b5563;
+}
+
+.reservas-header h1 {
+  color: #7c3aed;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.reservas-header p {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.reservas-section {
+  margin-bottom: 40px;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding: 15px 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.section-title.vigentes {
+  background-color: #d1fae5;
+  color: #065f46;
+  border-left: 5px solid #10b981;
+}
+
+.section-title.vencidas {
+  background-color: #fecaca;
+  color: #991b1b;
+  border-left: 5px solid #ef4444;
+}
+
+.reservas-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.reserva-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border-left: 5px solid transparent;
+}
+
+.reserva-card.vigente {
+  border-left-color: #10b981;
+}
+
+.reserva-card.vencida {
+  border-left-color: #ef4444;
+  opacity: 0.8;
+}
+
+.reserva-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.reserva-header {
+  background-color: #f8fafc;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.reserva-id {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.reserva-status {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.reserva-status.vigente {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.reserva-status.vencida {
+  background-color: #fecaca;
+  color: #991b1b;
+}
+
+.reserva-info {
+  padding: 20px;
+}
+
+.reserva-info h3 {
+  color: #1f2937;
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+.reserva-info p {
+  margin-bottom: 10px;
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+.reserva-info strong {
+  color: #374151;
+}
+
+.fecha {
+  background-color: #f3f4f6;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.principal {
+  margin-top: 10px;
+}
+
+.loading, .error-message, .no-reservas {
+  text-align: center;
+  padding: 50px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 20px 0;
+}
+
+.loading p, .no-reservas p {
+  color: #6b7280;
+  font-size: 1.2rem;
+}
+
+.error-message p {
+  color: #dc2626;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.refresh-button {
+  background-color: #7c3aed;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.refresh-button:hover {
+  background-color: #6d28d9;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .reservas-container {
+    padding: 15px;
+  }
+  
+  .reservas-header {
+    text-align: left;
+  }
+  
+  .volver-button {
+    position: static;
+    transform: none;
+    margin-bottom: 20px;
+    align-self: flex-start;
+  }
+  
+  .reservas-header h1 {
+    font-size: 2rem;
+    text-align: center;
+  }
+  
+  .reservas-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .reserva-info h3 {
+    font-size: 1.2rem;
+  }
+}
